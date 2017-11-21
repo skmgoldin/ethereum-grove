@@ -1,3 +1,5 @@
+pragma solidity ^0.4.18;
+
 // Grove v0.3
 import "libraries/GroveLib.sol";
 
@@ -17,18 +19,18 @@ contract Grove {
         mapping (bytes32 => bytes32) node_to_index;
         mapping (bytes32 => bytes32) node_id_lookup;
 
-        /// @notice Computes the id for a Grove index which is sha3(owner, indexName)
+        /// @notice Computes the id for a Grove index which is keccak256(owner, indexName)
         /// @param owner The address of the index owner.
         /// @param indexName The name of the index.
-        function computeIndexId(address owner, bytes32 indexName) constant returns (bytes32) {
-                return sha3(owner, indexName);
+        function computeIndexId(address owner, bytes32 indexName) public pure returns (bytes32) {
+                return keccak256(owner, indexName);
         }
 
-        /// @notice Computes the id for a node in a given Grove index which is sha3(indexId, id)
+        /// @notice Computes the id for a node in a given Grove index which is keccak256(indexId, id)
         /// @param indexId The id for the index the node belongs to.
         /// @param id The unique identifier for the data this node represents.
-        function computeNodeId(bytes32 indexId, bytes32 id) constant returns (bytes32) {
-                return sha3(indexId, id);
+        function computeNodeId(bytes32 indexId, bytes32 id) public pure returns (bytes32) {
+                return keccak256(indexId, id);
         }
 
         /*
@@ -36,43 +38,43 @@ contract Grove {
          */
         /// @notice Retrieves the id of the root node for this index.
         /// @param indexId The id of the index.
-        function getIndexRoot(bytes32 indexId) constant returns (bytes32) {
+        function getIndexRoot(bytes32 indexId) public view returns (bytes32) {
             return index_lookup[indexId].root;
         }
 
         /// @dev Retrieve the index id for the node.
         /// @param nodeId The id for the node
-        function getNodeIndexId(bytes32 nodeId) constant returns (bytes32) {
+        function getNodeIndexId(bytes32 nodeId) public view returns (bytes32) {
             return node_to_index[nodeId];
         }
 
         /// @dev Retrieve the value of the node.
         /// @param nodeId The id for the node
-        function getNodeValue(bytes32 nodeId) constant returns (int) {
+        function getNodeValue(bytes32 nodeId) public view returns (int) {
             return GroveLib.getNodeValue(index_lookup[node_to_index[nodeId]], node_id_lookup[nodeId]);
         }
 
         /// @dev Retrieve the height of the node.
         /// @param nodeId The id for the node
-        function getNodeHeight(bytes32 nodeId) constant returns (uint) {
+        function getNodeHeight(bytes32 nodeId) public view returns (uint) {
             return GroveLib.getNodeHeight(index_lookup[node_to_index[nodeId]], node_id_lookup[nodeId]);
         }
 
         /// @dev Retrieve the parent id of the node.
         /// @param nodeId The id for the node
-        function getNodeParent(bytes32 nodeId) constant returns (bytes32) {
+        function getNodeParent(bytes32 nodeId) public view returns (bytes32) {
             return GroveLib.getNodeParent(index_lookup[node_to_index[nodeId]], node_id_lookup[nodeId]);
         }
 
         /// @dev Retrieve the left child id of the node.
         /// @param nodeId The id for the node
-        function getNodeLeftChild(bytes32 nodeId) constant returns (bytes32) {
+        function getNodeLeftChild(bytes32 nodeId) public view returns (bytes32) {
             return GroveLib.getNodeLeftChild(index_lookup[node_to_index[nodeId]], node_id_lookup[nodeId]);
         }
 
         /// @dev Retrieve the right child id of the node.
         /// @param nodeId The id for the node
-        function getNodeRightChild(bytes32 nodeId) constant returns (bytes32) {
+        function getNodeRightChild(bytes32 nodeId) public view returns (bytes32) {
             return GroveLib.getNodeRightChild(index_lookup[node_to_index[nodeId]], node_id_lookup[nodeId]);
         }
 
@@ -80,7 +82,7 @@ contract Grove {
          *  one.  Returns 0x0 if there is no previous node.
          */
         /// @param nodeId The id for the node
-        function getPreviousNode(bytes32 nodeId) constant returns (bytes32) {
+        function getPreviousNode(bytes32 nodeId) public view returns (bytes32) {
             return GroveLib.getPreviousNode(index_lookup[node_to_index[nodeId]], node_id_lookup[nodeId]);
         }
 
@@ -88,7 +90,7 @@ contract Grove {
          *  one.  Returns 0x0 if there is no previous node.
          */
         /// @param nodeId The id for the node
-        function getNextNode(bytes32 nodeId) constant returns (bytes32) {
+        function getNextNode(bytes32 nodeId) public view returns (bytes32) {
             return GroveLib.getNextNode(index_lookup[node_to_index[nodeId]], node_id_lookup[nodeId]);
         }
 
@@ -113,7 +115,7 @@ contract Grove {
         /// @dev Query whether a node exists within the specified index for the unique identifier.
         /// @param indexId The id for the index.
         /// @param id The unique identifier of the data element.
-        function exists(bytes32 indexId, bytes32 id) constant returns (bool) {
+        function exists(bytes32 indexId, bytes32 id) public view returns (bool) {
             return GroveLib.exists(index_lookup[indexId], id);
         }
 
@@ -133,7 +135,7 @@ contract Grove {
         /** @param operator One of '>', '>=', '<', '<=', '==' to specify what
          *  type of comparison operator should be used.
          */
-        function query(bytes32 indexId, bytes2 operator, int value) constant returns (bytes32) {
+        function query(bytes32 indexId, bytes2 operator, int value) public view returns (bytes32) {
                 return GroveLib.query(index_lookup[indexId], operator, value);
         }
 }
